@@ -1,8 +1,8 @@
 //
 //  AppDelegate.swift
-//  Movies
+//  CarApp-MVVM
 //
-//  Created by Secrieru Andrei on 10.11.2022.
+//  Created by Secrieru Andrei on 08.11.2022.
 //
 
 import UIKit
