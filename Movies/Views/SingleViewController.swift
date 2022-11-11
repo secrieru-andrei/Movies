@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class SingleViewController: UIViewController {
+class SingleViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     //MARK: - Properties
     
@@ -16,7 +16,13 @@ class SingleViewController: UIViewController {
         let viewModel = MovieViewModel()
         return viewModel
     }()
-
+    
+    var switchControl: UISwitch = {
+        let switchControl = UISwitch()
+        switchControl.isOn = false
+        return switchControl
+    }()
+    
     private var cancellables: Set<AnyCancellable> = []
     
     var image: UIImageView = {
@@ -53,17 +59,27 @@ class SingleViewController: UIViewController {
         return button
     }()
     
+    lazy var tableView: UITableView = {
+        let table = UITableView()
+        table.translatesAutoresizingMaskIntoConstraints = false
+        table.rowHeight = 200
+        table.register(MovieTableViewCell.self, forCellReuseIdentifier: "cell")
+        table.isHidden = true
+        return table
+    }()
+    
     //MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
+        setUpNavBar()
         setUpViewLayout()
         bindViewModel()
         forwardBtn.addTarget(self, action: #selector(forwardIsPressed), for: .touchUpInside)
         backBtn.addTarget(self, action: #selector(backIsPressed), for: .touchUpInside)
         image.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageIsTapped)))
+        switchControl.addTarget(self, action: #selector(switchTapped), for: .valueChanged)
     }
 }
-
 
 //MARK: - Layout
 typealias SingleViewControllerLayout = SingleViewController
@@ -73,6 +89,7 @@ extension SingleViewControllerLayout {
         setUpImageLayout()
         setUpForwardBtnLayout()
         setUpBackBtnLayout()
+        setUpTableViewLayout()
     }
     
     func setUpTitleLayout() {
@@ -110,6 +127,21 @@ extension SingleViewControllerLayout {
             backBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             backBtn.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             backBtn.widthAnchor.constraint(equalToConstant: 100)
+        ])
+    }
+    
+    func setUpNavBar(){
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: switchControl)
+        navigationItem.title = "Movies"
+    }
+    
+    func setUpTableViewLayout(){
+        self.view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
 }
@@ -154,6 +186,11 @@ extension SingleViewControllerBtnActions {
         navigationController?.view.layer.add(transition, forKey: nil)
         navigationController?.pushViewController(newVc, animated: false)
     }
+    
+    @objc func switchTapped() {
+        let value: Bool = switchControl.isOn
+        showView(value: value)
+    }
 }
 
 //MARK: - Animations
@@ -182,11 +219,14 @@ extension SingleViewControllerBindings {
             self?.titleLabel.text = movie.first?.title
             guard let imageUrl = movie.first?.posterImage else {return}
             self?.image.loadImageFromURL(url: imageUrl)
-
+            self?.viewModel.moviesCount = movie.count
+            self?.loadTableViewData()
         }.store(in: &cancellables)
         disableButtons()
     }
 }
+
+//MARK: - Change Movie
 
 typealias SingleViewControllerChangeMovie = SingleViewController
 extension SingleViewControllerChangeMovie {
@@ -194,7 +234,53 @@ extension SingleViewControllerChangeMovie {
         animate(uiView: self.titleLabel, newValue: viewModel.movies[index].title!, options: .transitionCrossDissolve, duration: 0.5)
         disableButtons()
         animate(uiView: image, newValue: viewModel.movies[index].posterImage!, options: .transitionCrossDissolve, duration: 0.5)
-        
+    }
+}
+
+//MARK: - TableView Data Source
+
+typealias TableViewControllerDataSource = SingleViewController
+extension TableViewControllerDataSource {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! MovieTableViewCell
+        let movie = viewModel.cellForRowAt(indexPath: indexPath)
+        cell.setCell(movie: movie)
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return  viewModel.moviesCount
+    }
+    
+    func loadTableViewData() {
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.reloadData()
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel.itemIndex = indexPath.row
+        imageIsTapped()
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Movies"
+    }
+}
+
+//MARK: Show/Hide Views
+
+typealias SingleViewControllerShowOrHideView = SingleViewController
+extension SingleViewControllerShowOrHideView {
+    func showView(value: Bool){
+        self.titleLabel.isHidden = value
+        self.image.isHidden = value
+        self.tableView.isHidden = !value
+        let transition = CATransition()
+        transition.duration = 0.5
+        transition.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
+        transition.type = CATransitionType.fade
+        self.view.layer.add(transition, forKey: nil)
     }
 }
 

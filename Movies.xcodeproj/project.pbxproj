@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7554A89F291E926B001E8B87 /* MovieTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7554A89E291E926B001E8B87 /* MovieTableViewCell.swift */; };
 		75BD5F35291D859100B6DA6D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75BD5F34291D859100B6DA6D /* AppDelegate.swift */; };
 		75BD5F37291D859100B6DA6D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75BD5F36291D859100B6DA6D /* SceneDelegate.swift */; };
 		75BD5F39291D859100B6DA6D /* SingleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75BD5F38291D859100B6DA6D /* SingleViewController.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7554A89E291E926B001E8B87 /* MovieTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieTableViewCell.swift; sourceTree = "<group>"; };
 		75BD5F31291D859100B6DA6D /* Movies.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Movies.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		75BD5F34291D859100B6DA6D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		75BD5F36291D859100B6DA6D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 			children = (
 				75BD5F38291D859100B6DA6D /* SingleViewController.swift */,
 				75BD5F4F291D8BD000B6DA6D /* ShowDetailsViewController.swift */,
+				7554A89E291E926B001E8B87 /* MovieTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -189,6 +192,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7554A89F291E926B001E8B87 /* MovieTableViewCell.swift in Sources */,
 				75BD5F54291D8C0800B6DA6D /* MovieModel.swift in Sources */,
 				75BD5F50291D8BD000B6DA6D /* ShowDetailsViewController.swift in Sources */,
 				75BD5F52291D8BFE00B6DA6D /* MovieViewModel.swift in Sources */,
