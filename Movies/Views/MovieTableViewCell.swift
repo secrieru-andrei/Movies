@@ -19,6 +19,7 @@ class MovieTableViewCell: UITableViewCell {
         title.font = UIFont(name: "Avenir-Black", size: 28)
         title.numberOfLines = 2
         title.textAlignment = .center
+        title.textColor = .white
         return title
     }()
     
@@ -29,6 +30,7 @@ class MovieTableViewCell: UITableViewCell {
         description.adjustsFontSizeToFitWidth = true
         description.textAlignment = .justified
         description.font = UIFont(name: "Avenir-Light", size: 12 )
+        description.textColor = .white
         return description
     }()
     

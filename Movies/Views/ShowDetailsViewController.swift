@@ -34,6 +34,7 @@ class ShowDetailsViewController: UIViewController {
         label.numberOfLines = 0
         label.adjustsFontSizeToFitWidth = true
         label.font = UIFont(name: "Avenir-Light", size: 22 )
+        label.textColor = .white
         return label
     }()
     
@@ -41,6 +42,7 @@ class ShowDetailsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        modifiers()
         setUpViewLayout()
     }
 }
@@ -99,6 +101,32 @@ extension ShowDetailsViewControllerBindings {
         animate(uiView: image, newValue: movie.posterImage!, options: .transitionCrossDissolve, duration: 0.5)
         self.title = movie.title
         animate(uiView: descriptionLabel, newValue: movie.overview!, options: .transitionCrossDissolve, duration: 0.5)
+    }
+}
+
+//MARK: - Modifiers
+
+typealias ShowDetailsViewControllerViewModifiers = ShowDetailsViewController
+extension ShowDetailsViewControllerViewModifiers {
+    func modifiers() {
+        bgModifiers()
+    }
+    
+    func bgModifiers(){
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = self.view.bounds
+        gradientLayer.colors = [
+            UIColor.black.cgColor,
+            UIColor(named: "darkRed")!.cgColor,
+            UIColor.systemRed.cgColor,
+        ]
+        self.view.layer.addSublayer(gradientLayer)
+        
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.dark)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = view.bounds
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(blurEffectView)
     }
 }
     
