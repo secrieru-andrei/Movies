@@ -69,7 +69,7 @@ class SingleViewController: UIViewController, UITableViewDataSource, UITableView
     lazy var tableView: UITableView = {
         let table = UITableView()
         table.translatesAutoresizingMaskIntoConstraints = false
-        table.rowHeight = 200
+        table.rowHeight = 250
         table.register(MovieTableViewCell.self, forCellReuseIdentifier: "cell")
         table.isHidden = true
         table.backgroundColor = .clear
@@ -79,14 +79,9 @@ class SingleViewController: UIViewController, UITableViewDataSource, UITableView
     //MARK: - ViewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.black
-        self.navigationController?.navigationBar.tintColor = UIColor.white
         modifiers()
-        setUpNavBar()
         setUpViewLayout()
         bindViewModel()
-        forwardBtn.addTarget(self, action: #selector(forwardIsPressed), for: .touchUpInside)
-        backBtn.addTarget(self, action: #selector(backIsPressed), for: .touchUpInside)
         image.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(imageIsTapped)))
         switchControl.addTarget(self, action: #selector(switchTapped), for: .valueChanged)
         self.view.isUserInteractionEnabled = true
@@ -105,8 +100,6 @@ extension SingleViewControllerLayout {
     func setUpViewLayout() {
         setUpImageLayout()
         setUpTitleLayout()
-        setUpForwardBtnLayout()
-        setUpBackBtnLayout()
         setUpTableViewLayout()
     }
     
@@ -146,11 +139,6 @@ extension SingleViewControllerLayout {
             backBtn.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
             backBtn.widthAnchor.constraint(equalToConstant: 100)
         ])
-    }
-    
-    func setUpNavBar(){
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: switchControl)
-        navigationItem.title = "Movies"
     }
     
     func setUpTableViewLayout(){
@@ -196,6 +184,7 @@ extension SingleViewControllerBtnActions {
     
     @objc func imageIsTapped(){
         let newVc = ShowDetailsViewController()
+        viewModel.itemId = self.viewModel.movies[self.viewModel.itemIndex].id
         newVc.viewModel = self.viewModel
         let transition = CATransition()
         transition.duration = 0.5
@@ -264,6 +253,7 @@ extension TableViewControllerDataSource {
         let movie = viewModel.cellForRowAt(indexPath: indexPath)
         cell.setCell(movie: movie)
         cell.backgroundColor = UIColor(white: 0, alpha: 0.5)
+        cell.selectionStyle = .none
         return cell
     }
     
@@ -279,12 +269,9 @@ extension TableViewControllerDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.itemIndex = indexPath.row
+        viewModel.itemId = viewModel.movies[self.viewModel.itemIndex].id
         imageIsTapped()
     }
-    
-//    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return "Movies"
-//    }
 }
 
 //MARK: Show/Hide Views
@@ -312,7 +299,6 @@ extension SingleViewControllerViewModifiers {
     func modifiers() {
         backgroundgModifiers()
         buttonsModifiers()
-        tableViewModifiers()
     }
     
     func backgroundgModifiers(){
@@ -330,7 +316,6 @@ extension SingleViewControllerViewModifiers {
         blurEffectView.frame = view.bounds
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(blurEffectView)
-
     }
     
     func buttonsModifiers () {
@@ -338,12 +323,6 @@ extension SingleViewControllerViewModifiers {
         titleLabel.layer.shadowRadius = 2
         titleLabel.layer.shadowOpacity = 1
         titleLabel.layer.shadowOffset = CGSize(width: 3, height: 3)
-        
     }
-    
-    func tableViewModifiers () {
-        
-    }
-    
 }
 

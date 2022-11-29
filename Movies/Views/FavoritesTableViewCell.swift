@@ -1,14 +1,14 @@
 //
-//  MovieTableViewCell.swift
+//  FavoritesTableViewCell.swift
 //  Movies
 //
-//  Created by Secrieru Andrei on 11.11.2022.
+//  Created by Secrieru Andrei on 18.11.2022.
 //
 
 import UIKit
 
-class MovieTableViewCell: UITableViewCell {
-    
+class FavoritesTableViewCell: UITableViewCell {
+
     //MARK: - Properties
     
     var titleLabel: UILabel! = {
@@ -93,7 +93,7 @@ class MovieTableViewCell: UITableViewCell {
             imageLabel.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.4)
         ])
     }
-        
+    
     func setDescriptionLayout() {
         NSLayoutConstraint.activate([
             descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 5),
@@ -102,4 +102,5 @@ class MovieTableViewCell: UITableViewCell {
             descriptionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5)
         ])
     }
+
 }

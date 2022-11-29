@@ -11,9 +11,12 @@ import Combine
 class MovieViewModel: ObservableObject {
     
     @Published var itemIndex: Int = 0
+    @Published var itemId: Int = 0
     @Published var moviesCount = 0
+    @Published var favoritesCount = 0
     private var apiService = ApiService()
     @Published var movies: [Movie] = []
+    @Published var favorites: [Movie] = []
     
     init(){
         fetchData()
@@ -45,7 +48,36 @@ extension ViewModelTableViewData {
         return moviesCount
     }
     
+    func getNumberOfFavorites(section: Int) -> Int {
+        return favoritesCount
+    }
+    
     func cellForRowAt(indexPath: IndexPath) -> Movie {
         return movies[indexPath.row]
+    }
+    
+    func favoritesCellForRowAt(indexPath: IndexPath) -> Movie {
+        return favorites[indexPath.row]
+    }
+}
+
+//MARK: - Favorites Control
+
+typealias ViewModelFavoritesControl = MovieViewModel
+extension ViewModelFavoritesControl {
+    func saveToFavorites(movie: Movie){
+        favorites.append(movie)
+    }
+    
+    func removeFromFavorites(movie: Movie){
+        favorites.removeAll(where: {$0.id == movie.id})
+    }
+    
+    func checkMovieIsInFavorite(movie: Movie) -> Bool {
+        if favorites.contains(where: {$0.id == movie.id}) {
+          return true
+        } else {
+            return false
+        }
     }
 }

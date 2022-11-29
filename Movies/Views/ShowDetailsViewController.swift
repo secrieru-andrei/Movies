@@ -18,6 +18,8 @@ class ShowDetailsViewController: UIViewController {
         }
     }
     
+    private var isInFavorites: Bool = false
+    
     private var cancellables: Set<AnyCancellable> = []
     
     lazy var image: UIImageView = {
@@ -38,12 +40,35 @@ class ShowDetailsViewController: UIViewController {
         return label
     }()
     
+    lazy var textLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Add to favorites"
+        label.numberOfLines = 1
+        label.textColor = .white
+        label.font = UIFont(name: "Avenir-Light", size: 22 )
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    lazy var favButton: UIButton = {
+        let btn = UIButton()
+        let starImage = UIImage(systemName: "star")
+        let starFilledImage = UIImage(systemName: "star.fill")
+        btn.setImage(starImage, for: .normal)
+        btn.tintColor = .systemYellow
+        btn.setImage(starFilledImage, for: .highlighted)
+        btn.imageView?.contentMode = .scaleAspectFit
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
     //MARK: - ViewDidLoad
     
     override func viewDidLoad() {
         super.viewDidLoad()
         modifiers()
         setUpViewLayout()
+        favButton.addTarget(self, action: #selector(favButtonTapped), for: .touchUpInside)
     }
 }
 
@@ -54,6 +79,8 @@ extension ShowDetailsViewControllerLayout {
     func setUpViewLayout() {
         setUpDescriptionLayout()
         setUpImageLayout()
+        setUpLabelLayout()
+        setUpFavoriteButton()
     }
     
     func setUpDescriptionLayout() {
@@ -75,6 +102,26 @@ extension ShowDetailsViewControllerLayout {
             image.widthAnchor.constraint(equalTo: image.heightAnchor)
         ])
     }
+    
+    func setUpFavoriteButton() {
+        view.addSubview(favButton)
+        NSLayoutConstraint.activate([
+            favButton.centerYAnchor.constraint(equalTo: textLabel.centerYAnchor),
+            favButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            favButton.widthAnchor.constraint(equalToConstant: 50),
+            favButton.heightAnchor.constraint(equalToConstant: 50)
+        ])
+    }
+    
+    func setUpLabelLayout() {
+        view.addSubview(textLabel)
+        NSLayoutConstraint.activate([
+            textLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 16),
+            textLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor , constant: 16),
+            textLabel.widthAnchor.constraint(greaterThanOrEqualTo: view.widthAnchor, multiplier: 0.3),
+            textLabel.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2)
+        ])
+    }
 }
 
 //MARK: - Animations
@@ -94,13 +141,18 @@ extension ShowDetailsViewControllerAnimations {
     }
 }
 
+//MARK: - Binding
+
 typealias ShowDetailsViewControllerBindings = ShowDetailsViewController
 extension ShowDetailsViewControllerBindings {
     private func bindViewModel() {
-        let movie = viewModel.movies[viewModel.itemIndex]
-        animate(uiView: image, newValue: movie.posterImage!, options: .transitionCrossDissolve, duration: 0.5)
-        self.title = movie.title
-        animate(uiView: descriptionLabel, newValue: movie.overview!, options: .transitionCrossDissolve, duration: 0.5)
+        if let item = viewModel.movies.first(where: {$0.id == viewModel.itemId }) {
+            self.isInFavorites = self.viewModel.checkMovieIsInFavorite(movie: item)
+            favButtonState()
+            animate(uiView: image, newValue: item.posterImage!, options: .transitionCrossDissolve, duration: 0.5)
+            self.title = item.title
+            animate(uiView: descriptionLabel, newValue: item.overview!, options: .transitionCrossDissolve, duration: 0.5)
+        }
     }
 }
 
@@ -110,6 +162,7 @@ typealias ShowDetailsViewControllerViewModifiers = ShowDetailsViewController
 extension ShowDetailsViewControllerViewModifiers {
     func modifiers() {
         bgModifiers()
+        favButtonState()
     }
     
     func bgModifiers(){
@@ -128,6 +181,35 @@ extension ShowDetailsViewControllerViewModifiers {
         blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         view.addSubview(blurEffectView)
     }
-}
     
+    func favButtonState() {
+        if isInFavorites == true {
+            favButton.isHighlighted = true
+        } else {
+            favButton.isHighlighted = false
+        }
+    }
+}
+
+//MARK: - Buttons Actions
+
+typealias ShowDetailsViewControllerBtnActions = ShowDetailsViewController
+extension ShowDetailsViewControllerBtnActions {
+    @objc func favButtonTapped() {
+        if isInFavorites == false{
+            viewModel.favoritesCount += 1
+            viewModel.saveToFavorites(movie: viewModel.movies[viewModel.itemIndex])
+            DispatchQueue.main.async {
+                self.favButton.isHighlighted = true
+                self.isInFavorites = true
+            }
+        } else {
+            let newVc = FavoritesViewController()
+            viewModel.favoritesCount -= 1
+            viewModel.removeFromFavorites(movie: viewModel.favorites[viewModel.itemIndex])
+            newVc.viewModel = self.viewModel
+            self.isInFavorites = false
+        }
+    }
+}
     
