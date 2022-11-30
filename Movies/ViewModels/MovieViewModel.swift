@@ -17,7 +17,8 @@ class MovieViewModel: ObservableObject {
     private var apiService = ApiService()
     @Published var movies: [Movie] = []
     @Published var favorites: [Movie] = []
-    
+    var favoriteMoviesId: [Int] = []
+    var userDefaults = UserDefaults.standard
     init(){
         fetchData()
     }
@@ -67,10 +68,13 @@ typealias ViewModelFavoritesControl = MovieViewModel
 extension ViewModelFavoritesControl {
     func saveToFavorites(movie: Movie){
         favorites.append(movie)
+        favoriteMoviesId.append(movie.id)
     }
     
     func removeFromFavorites(movie: Movie){
         favorites.removeAll(where: {$0.id == movie.id})
+        favoriteMoviesId.removeAll(where: {$0 == movie.id})
+        self.saveData()
     }
     
     func checkMovieIsInFavorite(movie: Movie) -> Bool {
@@ -78,6 +82,23 @@ extension ViewModelFavoritesControl {
           return true
         } else {
             return false
+        }
+    }
+    
+    func saveData() {
+        userDefaults.set(favoriteMoviesId, forKey: "SavedFavorites")
+    }
+    
+    func fetchIdFromUserDefaults() {
+        favoriteMoviesId = userDefaults.object(forKey: "SavedFavorites") as? [Int] ?? [Int]()
+    }
+    
+    func fillFavoritesArrayWithData(movies: [Movie]) {
+        for movie in movies {
+            if favoriteMoviesId.contains(where: {$0 == movie.id}) {
+                favorites.append(movie)
+                favoritesCount += 1
+            }
         }
     }
 }

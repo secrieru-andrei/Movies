@@ -19,6 +19,12 @@ class MainViewController: UITabBarController {
         self.navigationItem.title = "Movies"
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: singleVc.switchControl)
         self.setViewControllers([singleVc,favoritesVc], animated: true)
+        singleVc.viewModel.fetchIdFromUserDefaults()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        singleVc.viewModel.saveData()
     }
 }
 

@@ -69,6 +69,9 @@ class ShowDetailsViewController: UIViewController {
         modifiers()
         setUpViewLayout()
         favButton.addTarget(self, action: #selector(favButtonTapped), for: .touchUpInside)
+        let rightGesture = UISwipeGestureRecognizer(target: self, action: #selector(leftGesture))
+        rightGesture.direction = .right
+        self.view.addGestureRecognizer(rightGesture)
     }
 }
 
@@ -202,6 +205,7 @@ extension ShowDetailsViewControllerBtnActions {
             DispatchQueue.main.async {
                 self.favButton.isHighlighted = true
                 self.isInFavorites = true
+                self.viewModel.saveData()
             }
         } else {
             let newVc = FavoritesViewController()
@@ -211,5 +215,9 @@ extension ShowDetailsViewControllerBtnActions {
             self.isInFavorites = false
         }
     }
-}
     
+    @objc func leftGesture() {
+        self.navigationController?.popViewController(animated: true)
+    }
+}
+
