@@ -228,6 +228,7 @@ extension SingleViewControllerBindings {
             self?.image.loadImageFromURL(url: imageUrl)
             self?.viewModel.moviesCount = movie.count
             self?.loadTableViewData()
+            self?.viewModel.fillFavoritesArrayWithData(movies: movie)
         }.store(in: &cancellables)
         disableButtons()
     }
